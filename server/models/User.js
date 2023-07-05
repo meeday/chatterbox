@@ -8,8 +8,7 @@ let image =
 const userSchema = new Schema({
   username: {
     type: String,
-    unique: true,
-    required: [true, "Please Provide a username"],
+    required: [true, "Please Provide a Username"],
     trim: true,
     minlength: 4,
   },
@@ -19,12 +18,12 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: [true, "Please Provide a email"],
+    required: [true, "please provide a email"],
     unique: true,
     trim: true,
     validate: {
       validator: validator.isEmail,
-      message: "please provide Email",
+      message: "Please Provide Email",
     },
   },
   password: {
@@ -41,15 +40,17 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.pre("save", async (next) => {
+userSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("password")) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
   }
+
   next();
 });
 
-userSchema.methods.isCorrectPassword = async (password) => {
+// custom method to compare and validate password for logging in
+userSchema.methods.isCorrectPassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 

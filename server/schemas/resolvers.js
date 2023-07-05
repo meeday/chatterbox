@@ -86,5 +86,151 @@ const resolvers = {
       throw new AuthenticationError("Not logged in");
     },
   },
-  Mutation: {},
+  Mutation: {
+    login: async (parent, { username, password }) => {
+      const user = await User.findOne({ username });
+
+      if (!user) {
+        throw new AuthenticationError("Incorrect credentials");
+      }
+
+      const correctPw = await user.isCorrectPassword(password);
+
+      if (!correctPw) {
+        throw new AuthenticationError("Incorrect credentials");
+      }
+
+      const token = signToken(user);
+      return { token, user };
+    },
+
+    signup: async (parent, { userData }) => {
+      const user = await User.create(userData);
+      const token = signToken(user);
+
+      return { token, user };
+    },
+
+    createChat: async (parent, { users, chatName }, context) => {
+      if (context.user) {
+        users.push(context.user._id);
+
+        const groupChat = await Chat.create({
+          chatName: chatName,
+          users: users,
+          isGroupChat: true,
+          groupAdmin: context.user._id,
+        });
+
+        const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+          .populate("users", "-password")
+          .populate("groupAdmin", "-password");
+
+        return fullGroupChat;
+      }
+
+      throw new AuthenticationError("Not logged in");
+    },
+
+    renameChat: async (parent, { chatId, chatName }, context) => {
+      if (context.user) {
+        const updateChat = await Chat.findByIdAndUpdate(
+          chatId,
+          {
+            chatName: chatName,
+          },
+          {
+            new: true,
+          }
+        )
+          .populate("users", "-password")
+          .populate("groupAdmin", "-password");
+
+        if (!updateChat) {
+          throw new AuthenticationError("Chat Not Found");
+        }
+        return updateChat;
+      }
+      throw new AuthenticationError("Not logged in");
+    },
+
+    removeUserFromChat: async (parent, { chatId, userId }, context) => {
+      if (context.user) {
+        const removeUser = await Chat.findByIdAndUpdate(
+          chatId,
+          {
+            $pull: { users: userId },
+          },
+          {
+            new: true,
+          }
+        )
+          .populate("users", "-password")
+          .populate("groupAdmin", "-password");
+
+        if (!removeUser) {
+          throw new AuthenticationError("Chat Not Found");
+        }
+
+        return removeUser;
+      }
+
+      throw new AuthenticationError("Not logged in");
+    },
+
+    addUserToChat: async (parent, { chatId, userId }, context) => {
+      if (context.user) {
+        const addUser = await Chat.findByIdAndUpdate(
+          chatId,
+          {
+            $push: { users: userId },
+          },
+          {
+            new: true,
+          }
+        )
+          .populate("users", "-password")
+          .populate("groupAdmin", "-password");
+
+        if (!addUser) {
+          throw new AuthenticationError("Chat Not Found");
+        }
+
+        return addUser;
+      }
+
+      throw new AuthenticationError("Not logged in");
+    },
+
+    sendMessage: async (parent, { message, chatId }, context) => {
+      if (context.user) {
+        let newMessage = {
+          sender: context.user._id,
+          message: message,
+          chat: chatId,
+        };
+
+        let m = await Message.create(newMessage);
+
+        m = await m.populate("sender", "username avatar");
+        m = await m.populate("chat");
+        m = await User.populate(m, {
+          path: "chat.users",
+          select: "username avatar email _id",
+        });
+
+        await Chat.findByIdAndUpdate(
+          chatId,
+          { latestMessage: m },
+          { new: true }
+        );
+
+        return m;
+      }
+
+      throw new AuthenticationError("Not logged in");
+    },
+  },
 };
+
+module.exports = resolvers;

@@ -89,7 +89,7 @@ export const QUERY_ALL_CHATS = gql`
 `;
 
 export const QUERY_ALL_MESSAGES = gql`
-  query getAllMessages($chatId: ID) {
+  query getAllMessages($chatId: ID!) {
     getAllMessages(chatId: $chatId) {
       _id
       chat {

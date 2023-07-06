@@ -81,8 +81,8 @@ export const RENAME_CHAT = gql`
 `;
 
 export const REMOVE_USER_FROM_CHAT = gql`
-  mutation removeFromUserFromChat($chatId: ID!, $userId: ID!) {
-    removeFromUserFromChat(chatId: $chatId, userId: $userId) {
+  mutation removeUserFromChat($chatId: ID!, $userId: ID!) {
+    removeUserFromChat(chatId: $chatId, userId: $userId) {
       _id
       chatName
       groupAdmin {

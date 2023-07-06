@@ -14,7 +14,7 @@ const userSchema = new Schema({
   },
   avatar: {
     type: String,
-    default: image,
+    default: null,
   },
   email: {
     type: String,
@@ -44,6 +44,9 @@ userSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("password")) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
+  }
+  if (!this.avatar) {
+    this.avatar = image;
   }
 
   next();

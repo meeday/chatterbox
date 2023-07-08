@@ -49,7 +49,8 @@ const typeDefs = gql`
   type Mutation {
     login(username: String!, password: String!): Auth
     signup(userData: UserInput!): Auth
-    createChat(users: [String], chatName: String!): Chat
+    createGroupChat(chatName: String!, users: [String]): Chat
+    createChat(chatName: String!, user: String): Chat
     renameChat(chatId: ID!, chatName: String!): Chat
     addUserToChat(chatId: ID!, userId: ID!): Chat
     removeUserFromChat(chatId: ID!, userId: ID!): Chat

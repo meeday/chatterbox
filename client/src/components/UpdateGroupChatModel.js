@@ -61,8 +61,8 @@ const UpdateGroupChatModel = () => {
 
   const handleRemove = async (user1) => {
     if (
-      chat.selectedChat.groupAdmin._id !== auth.user._id &&
-      user1._id !== auth.user._id
+      chat.selectedChat.groupAdmin._id !== auth.user.userId &&
+      user1._id !== auth.user.userId
     ) {
       toast.error("Only Admin Have Permission To Remove User");
       return;
@@ -78,7 +78,7 @@ const UpdateGroupChatModel = () => {
         },
       });
 
-      user1._id === auth.user._id
+      user1._id === auth.user.userId
         ? dispatch(setSelectedChat())
         : dispatch(setSelectedChat(data.removeUserFromGroup));
 
@@ -166,7 +166,6 @@ const UpdateGroupChatModel = () => {
 
   return (
     <>
-      update
       <IconButton
         display={{ base: "flex" }}
         icon={<ViewIcon />}

@@ -31,8 +31,35 @@ export const SIGNUP = gql`
 `;
 
 export const CREATE_CHAT = gql`
-  mutation createChat($chatName: String!, $users: [String!]) {
+  mutation createChat($chatName: String!, $users: String) {
     createChat(chatName: $chatName, users: $users) {
+      _id
+      chatName
+      groupAdmin {
+        _id
+        username
+        avatar
+      }
+      isGroupChat
+      latestMessage {
+        _id
+        message
+        sender {
+          _id
+          username
+        }
+      }
+      users {
+        _id
+        username
+      }
+    }
+  }
+`;
+
+export const CREATE_GROUP_CHAT = gql`
+  mutation createGroupChat($chatName: String!, $users: [String!]) {
+    createGroupChat(chatName: $chatName, users: $users) {
       _id
       chatName
       groupAdmin {

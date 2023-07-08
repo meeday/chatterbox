@@ -1,9 +1,11 @@
 export const getSender = (loggedUser, users) => {
-  if (loggedUser && users !== null) {
-    return users[0]._id === loggedUser._id
-      ? users[1].username
-      : users[0].username;
-  }
+  return users[0]._id === loggedUser._id
+    ? users[1].username
+    : users[0].username;
+};
+
+export const getUserThatsNotLoggedIn = (loggedUser, users) => {
+  return users.find((user) => user._id !== loggedUser.userId);
 };
 
 export const getSenderFull = (loggedUser, users) => {

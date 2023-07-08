@@ -75,11 +75,7 @@ const MyChats = () => {
                 borderRadius="lg"
                 key={chat?._id}
               >
-                <Text>
-                  {!chat.chats?.isGroupChat
-                    ? getSender(auth.user, chat?.users)
-                    : chat?.chatName}
-                </Text>
+                <Text>{chat?.chatName}</Text>
               </Box>
             ))}
           </Stack>

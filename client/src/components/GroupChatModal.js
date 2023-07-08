@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import {
   Modal,
   ModalOverlay,
@@ -20,6 +20,8 @@ import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
 import { toast } from "react-toastify";
 import { QUERY_USER } from "../utils/queries";
+import { CREATE_GROUP_CHAT } from "../utils/mutations";
+import { setChats } from "../reducers/chatReducer";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -31,6 +33,7 @@ const GroupChatModal = ({ children }) => {
 
   const { auth, chat, notification } = useSelector((state) => state);
 
+  const [createGroupChat, { error }] = useMutation(CREATE_GROUP_CHAT);
   const [
     runUserQuery,
     { loading: loadingUser, data: userData, error: userError },
@@ -66,21 +69,24 @@ const GroupChatModal = ({ children }) => {
   };
 
   const handleSubmit = async () => {
-    //   if (!groupChatName || !selectedUsers) {
-    //     toast.error("Please Fill Up All The Fields");
-    //     return;
-    //   }
-    //   try {
-    //     const { data } = await api.post(`/api/v1/chat/createGroup`, {
-    //       name: groupChatName,
-    //       users: JSON.stringify(selectedUsers.map((u) => u._id)),
-    //     });
-    //     setChats([data, ...chats]);
-    //     onClose();
-    //     toast.success("SuccessFully Created New Group");
-    //   } catch (error) {
-    //     toast.error("Failed To Create Group");
-    //   }
+    if (!groupChatName || !selectedUsers) {
+      toast.error("Please Fill Up All The Fields");
+      return;
+    }
+    try {
+      const { data } = await createGroupChat({
+        variables: {
+          chatName: groupChatName,
+          users: selectedUsers.map((u) => u._id),
+        },
+      });
+
+      setChats([data.createGroupChat, ...chat.chats]);
+      onClose();
+      toast.success("SuccessFully Created New Group");
+    } catch (error) {
+      toast.error("Failed To Create Group");
+    }
   };
 
   return (

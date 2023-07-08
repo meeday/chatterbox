@@ -11,13 +11,18 @@ import {
   Input,
   Spinner,
   Text,
+  Avatar,
 } from "@chakra-ui/react";
 import { toast } from "react-toastify";
-import { getSender, getSenderFull } from "../utils/chatUtils";
+import {
+  getSender,
+  getSenderFull,
+  getUserThatsNotLoggedIn,
+} from "../utils/chatUtils";
 import ProfileModal from "./ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import UpdateGroupChatModel from "./UpdateGroupChatModel";
-import { setSelectedChat, setChats } from "../reducers/chatReducer";
+import { setSelectedChat } from "../reducers/chatReducer";
 import { setNotifications } from "../reducers/notificationReducer";
 import { QUERY_ALL_MESSAGES, QUERY_ALL_CHATS } from "../utils/queries";
 import { SEND_MESSAGE } from "../utils/mutations";
@@ -89,7 +94,7 @@ export default function SingleChat() {
         const { data } = await sendMessage({
           variables: { message: newMessage, chatId: chat.selectedChat._id },
         });
-        console.log(data);
+
         setNewMessage("");
         socket.emit("new-message", data.sendMessage);
         setMessages([...messages, data.sendMessage]);
@@ -150,9 +155,39 @@ export default function SingleChat() {
             />
             {!chat.selectedChat.isGroupChat && chat.selectedChat !== {} ? (
               <>
-                {getSender(auth.user, chat.selectedChat.users)}
+                <div style={{ display: "flex" }}>
+                  <Avatar
+                    mt="7px"
+                    mr={1}
+                    size="sm"
+                    cursor="pointer"
+                    name={
+                      getUserThatsNotLoggedIn(
+                        auth.user,
+                        chat.selectedChat.users
+                      ).username
+                    }
+                    src={
+                      getUserThatsNotLoggedIn(
+                        auth.user,
+                        chat.selectedChat.users
+                      ).avatar
+                    }
+                  />
+                  <span>
+                    {
+                      getUserThatsNotLoggedIn(
+                        auth.user,
+                        chat.selectedChat.users
+                      ).username
+                    }
+                  </span>
+                </div>
                 <ProfileModal
-                  user={getSenderFull(auth.user, chat.selectedChat.users)}
+                  user={getUserThatsNotLoggedIn(
+                    auth.user,
+                    chat.selectedChat.users
+                  )}
                 />
               </>
             ) : (

@@ -37,12 +37,13 @@ const resolvers = {
           path: "latestMessage.sender",
           select: "username avatar email _id",
         });
+        const { username } = await User.findById(userId, "username").exec();
 
         if (chat.length > 0) {
           return chat[0];
         } else {
           const createChat = await Chat.create({
-            chatName: "sender",
+            chatName: `you/${username}`,
             isGroupChat: false,
             users: [context.user._id, userId],
           });
@@ -111,17 +112,34 @@ const resolvers = {
       return { token, user };
     },
 
-    createChat: async (parent, { users, chatName }, context) => {
+    createChat: async (parent, { user, chatName }, context) => {
+      if (context.user) {
+        const groupChat = await Chat.create({
+          chatName: chatName,
+          users: [user, context.user._id],
+          isGroupChat: false,
+          groupAdmin: context.user._id,
+        });
+        const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+          .populate("users", "-password")
+          .populate("groupAdmin", "-password");
+
+        return fullGroupChat;
+      }
+
+      throw new AuthenticationError("Not logged in");
+    },
+
+    createGroupChat: async (parent, { users, chatName }, context) => {
       if (context.user) {
         users.push(context.user._id);
 
         const groupChat = await Chat.create({
           chatName: chatName,
           users: users,
-          isGroupChat: false,
+          isGroupChat: true,
           groupAdmin: context.user._id,
         });
-
         const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
           .populate("users", "-password")
           .populate("groupAdmin", "-password");

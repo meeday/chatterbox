@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLazyQuery } from "@apollo/client";
+import { isEmpty } from "lodash";
 import { Button } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
@@ -35,7 +36,7 @@ import ProfileModal from "./ProfileModal";
 import { logout } from "..//reducers/authReducer";
 import { setSelectedChat, setChats } from "../reducers/chatReducer";
 import { setNotifications } from "../reducers/notificationReducer";
-import { QUERY_USER, QUERY_CHAT } from "../utils/queries";
+import { QUERY_USER, QUERY_CHAT, QUERY_ALL_CHATS } from "../utils/queries";
 import { getSender } from "../utils/chatUtils";
 
 const SideDrawer = () => {
@@ -61,6 +62,11 @@ const SideDrawer = () => {
     { loading: loadingChat, data: chatData, error: chatError },
   ] = useLazyQuery(QUERY_CHAT);
 
+  const [
+    runAllChatQuery,
+    { loading: loadingAllChats, data: AllChatData, error: AllChatError },
+  ] = useLazyQuery(QUERY_ALL_CHATS);
+
   const handleSearch = async (e) => {
     if (!search) {
       toast.error("Please Provide username");
@@ -83,23 +89,27 @@ const SideDrawer = () => {
     }
   }, [userData]);
 
-  const accessChat = async (userId) => {
-    try {
-      runChatQuery({ variables: { userId: userId } });
-
-      const IdExists = chat.chats.find(
-        (c) => c._id.trim() === chatData.getChat._id.trim()
-      );
-      if (IdExists) {
-        dispatch(setChats([chatData.getChat, ...chat.chats]));
-        dispatch(setSelectedChat(chatData.getChat));
-        setChatLoaded(true);
-      }
-    } catch (error) {
-      toast.error(error);
-    }
+  const accessChat = (userId) => {
+    runChatQuery({ variables: { userId: userId } });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await runChatQuery();
+        dispatch(setSelectedChat(chatData.getChat));
+        dispatch(setChats([...chat.chats, chatData.getChat]));
+        setChatLoaded(true);
+        onClose();
+      } catch (error) {
+        toast.error(error);
+      }
+    };
+
+    if (chatData && chatData.getChat) {
+      fetchData();
+    }
+  }, [chatData, runChatQuery]);
   const logoutHandler = () => {
     localStorage.removeItem("id_token");
     dispatch(logout());

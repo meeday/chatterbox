@@ -40,7 +40,7 @@ const Login = () => {
       const { data } = await login({
         variables: { username, password },
       });
-      console.log(data.login.user);
+
       dispatch(
         login_user({
           token: data.login.token,

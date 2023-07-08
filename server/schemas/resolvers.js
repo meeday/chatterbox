@@ -118,7 +118,7 @@ const resolvers = {
         const groupChat = await Chat.create({
           chatName: chatName,
           users: users,
-          isGroupChat: true,
+          isGroupChat: false,
           groupAdmin: context.user._id,
         });
 
@@ -212,7 +212,7 @@ const resolvers = {
 
         let m = await Message.create(newMessage);
 
-        m = await m.populate("sender", "username avatar");
+        m = await m.populate("sender", "_id username avatar");
         m = await m.populate("chat");
         m = await User.populate(m, {
           path: "chat.users",

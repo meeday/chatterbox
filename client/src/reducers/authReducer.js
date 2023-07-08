@@ -4,7 +4,14 @@ export const authReducer = createSlice({
   name: "auth",
   initialState: {
     isLoggedIn: false,
-    user: { token: "", username: "", userId: "" },
+    user: {
+      token: "",
+      username: "",
+      userId: "",
+      email: "",
+      bio: "",
+      avatar: "",
+    },
   },
   reducers: {
     login_user(state, action) {
@@ -15,6 +22,9 @@ export const authReducer = createSlice({
           token: action.payload.token,
           username: action.payload.username,
           userId: action.payload.userId,
+          email: action.payload.email,
+          bio: action.payload.bio,
+          avatar: action.payload.avatar,
         },
       };
     },
@@ -23,7 +33,14 @@ export const authReducer = createSlice({
       return {
         ...state,
         isLoggedIn: false,
-        user: { token: "", username: "", userId: "" },
+        user: {
+          token: "",
+          username: "",
+          userId: "",
+          email: "",
+          bio: "",
+          avatar: "",
+        },
       };
     },
 
@@ -35,6 +52,9 @@ export const authReducer = createSlice({
           token: action.payload.token,
           username: action.payload.username,
           userId: action.payload.userId,
+          email: action.payload.email,
+          bio: action.payload.bio,
+          avatar: action.payload.avatar,
         },
       };
     },

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-
+import { socket } from "../socket";
 import { Button } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/react";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/react";
@@ -51,6 +51,7 @@ const Login = () => {
           avatar: data.login.user.avatar,
         })
       );
+      socket.connect();
       localStorage.setItem("id_token", data.login.token);
       toast.success(`Welcome Back! ${data.login.user.username}`);
 
@@ -77,6 +78,7 @@ const Login = () => {
         <FormLabel>password</FormLabel>
         <InputGroup size="md">
           <Input
+            id="login-password"
             value={values.password}
             onChange={(e) => setValues({ ...values, password: e.target.value })}
             type={show ? "text" : "password"}

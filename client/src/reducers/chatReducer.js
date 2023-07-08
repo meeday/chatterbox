@@ -8,7 +8,6 @@ export const chatReducer = createSlice({
   },
   reducers: {
     setSelectedChat(state, action) {
-      console.log(action);
       return {
         ...state,
         selectedChat: action.payload,

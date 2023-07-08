@@ -25,10 +25,6 @@ const Register = () => {
       setTimeout(() => {
         navigate("/");
       }, 3000);
-    } else {
-      setTimeout(() => {
-        navigate("/register");
-      }, 3000);
     }
   }, [navigate, auth.isLoggedIn]);
 

@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useMutation } from "@apollo/client";
 import { SIGNUP } from "../utils/mutations";
 import { signup_user } from "..//reducers/authReducer";
+import { socket } from "../socket";
 
 import FileBase from "react-file-base64";
 
@@ -52,6 +53,7 @@ const Signup = () => {
         avatar: data.signup.user.avatar,
       };
       dispatch(signup_user(userData));
+      socket.connect();
       localStorage.setItem("id_token", data.signup.token);
       toast.success(`Hi There! ${data.signup.user.username} `);
 
@@ -83,6 +85,7 @@ const Signup = () => {
         <FormLabel>password</FormLabel>
         <InputGroup size="md">
           <Input
+            id="signup-password"
             type={show ? "text" : "password"}
             placeholder="password"
             onChange={(e) => setValues({ ...values, password: e.target.value })}

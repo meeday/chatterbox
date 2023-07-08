@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
-import io from "socket.io-client";
+import { isEmpty } from "lodash";
+import { socket } from "../socket";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -21,7 +22,7 @@ import { setNotifications } from "../reducers/notificationReducer";
 import { QUERY_ALL_MESSAGES, QUERY_ALL_CHATS } from "../utils/queries";
 import { SEND_MESSAGE } from "../utils/mutations";
 
-let socket, selectedChatCompare;
+let selectedChatCompare;
 
 export default function SingleChat() {
   const { auth, chat, notification } = useSelector((state) => state);
@@ -31,16 +32,11 @@ export default function SingleChat() {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [sendMessage, { error }] = useMutation(SEND_MESSAGE);
-  const dispatch = useDispatch;
+  const dispatch = useDispatch();
 
   const { loading, data } = useQuery(QUERY_ALL_MESSAGES, {
     variables: { chatId: chat.selectedChat._id },
   });
-
-  const [
-    runAllChatsQuery,
-    { loading: loadingAllChats, data: AllChatData, error: chatError },
-  ] = useLazyQuery(QUERY_ALL_CHATS);
 
   useEffect(() => {
     if (data && data.getAllMessages) {
@@ -50,14 +46,13 @@ export default function SingleChat() {
   }, [data, chat.selectedChat]);
 
   useEffect(() => {
-    socket = io(process.env.REACT_APP_SOCKET_ENDPOINT);
     socket.emit("setup", auth.user);
 
     socket.on("connected", () => setSocketConnected(true));
 
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop-typing", () => setIsTyping(false));
-  }, []);
+  }, [auth.user, chat.selectedChat]);
 
   useEffect(() => {
     socket.on("message-received", (newMessageReceived) => {
@@ -73,23 +68,28 @@ export default function SingleChat() {
               ...notification.notifications,
             ])
           );
-          runAllChatsQuery();
-          dispatch(setChats([AllChatData.getAllChat.chats, ...chat.chats]));
         }
       } else {
         setMessages([...messages, newMessageReceived]);
       }
     });
-  }, [AllChatData, dispatch]);
+  }, [
+    chat.chats,
+    messages,
+    notification.notifications,
+    dispatch,
+    chat.selectedChat,
+  ]);
 
   const sendNewMessage = async (e) => {
     if (e.key === "Enter" && newMessage) {
       socket.emit("stop-typing", chat.selectedChat._id);
+
       try {
         const { data } = await sendMessage({
           variables: { message: newMessage, chatId: chat.selectedChat._id },
         });
-
+        console.log(data);
         setNewMessage("");
         socket.emit("new-message", data.sendMessage);
         setMessages([...messages, data.sendMessage]);
@@ -121,8 +121,17 @@ export default function SingleChat() {
   };
 
   return (
-    <>
-      {Object.keys(chat.selectedChat).length > 0 ? (
+    <Box
+      display={{ base: "flex", md: "flex" }}
+      alignItems="center"
+      flexDir="column"
+      p={3}
+      bg="white"
+      w={{ base: "100%", md: "68%" }}
+      borderRadius="lg"
+      borderWidth="1px"
+    >
+      {!isEmpty(chat.selectedChat) ? (
         <>
           <Text
             fontSize={{ base: "28px", md: "30px" }}
@@ -139,7 +148,7 @@ export default function SingleChat() {
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat("")}
             />
-            {!chat.selectedChat.isGroupChat ? (
+            {!chat.selectedChat.isGroupChat && chat.selectedChat !== {} ? (
               <>
                 {getSender(auth.user, chat.selectedChat.users)}
                 <ProfileModal
@@ -177,7 +186,7 @@ export default function SingleChat() {
                 <ScrollableChat messages={messages} />
               </div>
             )}
-            <FormControl onKeyDown={sendMessage} h="15%" isRequired mt={3}>
+            <FormControl onKeyDown={sendNewMessage} h="15%" isRequired mt={3}>
               {isTyping ? <div>Typing ...</div> : <></>}
               <Input
                 variant="filled"
@@ -201,6 +210,6 @@ export default function SingleChat() {
           </Text>
         </Box>
       )}
-    </>
+    </Box>
   );
 }

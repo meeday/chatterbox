@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import {
   Modal,
   ModalOverlay,
@@ -146,13 +146,16 @@ const UpdateGroupChatModel = () => {
     try {
       setLoading(true);
 
-      const { data } = await api.patch(`/api/v1/chat/addUserToGroup`, {
-        chatId: chat.selectedChat._id,
-        userId: user1._id,
+      const { data } = addUserToChat({
+        variables: {
+          chatId: chat.selectedChat._id,
+          userId: user1._id,
+        },
       });
 
-      setSelectedChat(data);
-      setFetchAgain(!fetchAgain);
+      setSelectedChat(data.addUserToChat);
+      runAllChatsQuery();
+      dispatch(setChats([AllChatData.getAllChat.chats, ...chat.chats]));
       setLoading(false);
     } catch (error) {
       toast.error(error);

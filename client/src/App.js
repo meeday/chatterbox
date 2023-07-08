@@ -13,7 +13,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Register, Chat } from "./pages";
 
 const httpLink = createHttpLink({
-  uri: "/graphql",
+  uri: "http://localhost:3001/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -32,7 +32,6 @@ const client = new ApolloClient({
 });
 
 function App() {
-  const { auth } = useSelector((state) => state);
   return (
     <ApolloProvider client={client}>
       <ChakraProvider>

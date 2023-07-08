@@ -154,6 +154,11 @@ export const SEND_MESSAGE = gql`
           username
         }
       }
+      sender {
+        _id
+        username
+        avatar
+      }
     }
   }
 `;

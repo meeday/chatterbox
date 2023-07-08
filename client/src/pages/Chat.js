@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useQuery } from "@apollo/client";
 import { Box } from "@chakra-ui/react";
-import { SideDrawer, MyChats, ChatBox } from "../components";
+import { SideDrawer, MyChats, SingleChat } from "../components";
 import { QUERY_ALL_CHATS } from "../utils/queries";
 import { setChats } from "../reducers/chatReducer";
 const Chat = () => {
@@ -26,8 +26,8 @@ const Chat = () => {
         h="91.5vh"
         p="10px"
       >
-        {auth.user && <MyChats />}
-        {auth.user && <ChatBox />}
+        {auth.user && data && <MyChats />}
+        {auth.user && data && <SingleChat />}
       </Box>
     </div>
   );

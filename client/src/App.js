@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,15 +33,28 @@ const client = new ApolloClient({
 });
 
 function App() {
+  const { auth } = useSelector((state) => state);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!auth.isLoggedIn) {
+      navigate("/register");
+    }
+  }, [auth.isLoggedIn, navigate]);
+
   return (
     <ApolloProvider client={client}>
       <ChakraProvider>
-        <Router>
+        {auth.isLoggedIn ? (
           <Routes>
-            <Route path="/register" element={<Register />} />
             <Route path="/" element={<Chat />} />
           </Routes>
-        </Router>
+        ) : (
+          <Routes>
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        )}
+
         <ToastContainer position="top-center" />
       </ChakraProvider>
     </ApolloProvider>

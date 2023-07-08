@@ -27,6 +27,7 @@
     "react-scroll-into-view": "^1.12.1",
     "react-spring": "^9.7.2",
     "react-toastify": "^9.1.3",
+    "redux-persist": "^6.0.0",
     "socket.io-client": "^4.7.1",
     "styled-components": "^6.0.2",
     "web-vitals": "^2.1.4"

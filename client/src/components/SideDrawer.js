@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLazyQuery } from "@apollo/client";
-import { isEmpty } from "lodash";
+import { persistor } from "../store";
 import { Button } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
@@ -112,6 +112,7 @@ const SideDrawer = () => {
   }, [chatData, runChatQuery]);
   const logoutHandler = () => {
     localStorage.removeItem("id_token");
+    persistor.purge();
     dispatch(logout());
     navigate("/register");
   };

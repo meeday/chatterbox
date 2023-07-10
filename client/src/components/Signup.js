@@ -53,6 +53,7 @@ const Signup = () => {
         avatar: data.signup.user.avatar,
       };
       dispatch(signup_user(userData));
+
       socket.connect();
       localStorage.setItem("id_token", data.signup.token);
       toast.success(`Hi There! ${data.signup.user.username} `);

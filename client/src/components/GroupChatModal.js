@@ -21,7 +21,7 @@ import UserListItem from "./UserListItem";
 import { toast } from "react-toastify";
 import { QUERY_USER } from "../utils/queries";
 import { CREATE_GROUP_CHAT } from "../utils/mutations";
-import { setChats } from "../reducers/chatReducer";
+import { setChats, setSelectedChat } from "../reducers/chatReducer";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,6 +30,7 @@ const GroupChatModal = ({ children }) => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const { auth, chat, notification } = useSelector((state) => state);
 
@@ -81,7 +82,8 @@ const GroupChatModal = ({ children }) => {
         },
       });
 
-      setChats([data.createGroupChat, ...chat.chats]);
+      dispatch(setChats([data.createGroupChat, ...chat.chats]));
+      dispatch(setSelectedChat(data.createGroupChat));
       onClose();
       toast.success("SuccessFully Created New Group");
     } catch (error) {
@@ -154,7 +156,7 @@ const GroupChatModal = ({ children }) => {
                 color: "white",
               }}
             >
-              Create Chat
+              Create Group Chat
             </Button>
           </ModalFooter>
         </ModalContent>

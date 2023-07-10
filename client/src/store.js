@@ -1,7 +1,10 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  combineReducers,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-
 import authReducer from "./reducers/authReducer";
 import chatReducer from "./reducers/chatReducer";
 import notificationReducer from "./reducers/notificationReducer";
@@ -9,7 +12,6 @@ import notificationReducer from "./reducers/notificationReducer";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
 };
 
 const persistedReducer = persistReducer(
@@ -23,6 +25,9 @@ const persistedReducer = persistReducer(
 
 const store = configureStore({
   reducer: persistedReducer,
+  middleware: getDefaultMiddleware({
+    serializableCheck: false,
+  }),
 });
 
 export const persistor = persistStore(store);

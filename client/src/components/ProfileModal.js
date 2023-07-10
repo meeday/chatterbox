@@ -1,4 +1,5 @@
-import { ViewIcon } from "@chakra-ui/icons";
+// import { useSelector } from "react-redux";
+import { ViewIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -15,6 +16,7 @@ import {
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  // const { chat } = useSelector((state) => state);
 
   return (
     <>

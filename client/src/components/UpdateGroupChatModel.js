@@ -21,7 +21,7 @@ import {
 import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
 
-import { ViewIcon } from "@chakra-ui/icons";
+import { EditIcon } from "@chakra-ui/icons";
 import { toast } from "react-toastify";
 
 import {
@@ -77,7 +77,7 @@ const UpdateGroupChatModel = () => {
           userId: user1._id,
         },
       });
-
+      console.log(data);
       user1._id === auth.user.userId
         ? dispatch(setSelectedChat())
         : dispatch(setSelectedChat(data.removeUserFromGroup));
@@ -86,6 +86,7 @@ const UpdateGroupChatModel = () => {
       dispatch(setChats([AllChatData.getAllChat.chats, ...chat.chats]));
 
       setLoading(false);
+      onClose();
     } catch (error) {
       toast.error(error);
       setLoading(false);
@@ -111,7 +112,7 @@ const UpdateGroupChatModel = () => {
     }
   };
 
-  const handleRename = async () => {
+  const handleRename = async (e, u) => {
     if (!groupChatName) return;
 
     try {
@@ -125,6 +126,7 @@ const UpdateGroupChatModel = () => {
       runAllChatsQuery();
       dispatch(setChats([AllChatData.getAllChat.chats, ...chat.chats]));
       setRenameLoading(false);
+      onClose();
     } catch (error) {
       toast.error(error);
       setRenameLoading(false);
@@ -157,6 +159,7 @@ const UpdateGroupChatModel = () => {
       runAllChatsQuery();
       dispatch(setChats([AllChatData.getAllChat.chats, ...chat.chats]));
       setLoading(false);
+      onClose();
     } catch (error) {
       toast.error(error);
       setLoading(false);
@@ -168,7 +171,7 @@ const UpdateGroupChatModel = () => {
     <>
       <IconButton
         display={{ base: "flex" }}
-        icon={<ViewIcon />}
+        icon={<EditIcon />}
         onClick={onOpen}
       />
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -180,7 +183,7 @@ const UpdateGroupChatModel = () => {
             display="flex"
             justifyContent="center"
           >
-            {chat.selectedChat.chatName}
+            Update {chat.selectedChat.chatName}
           </ModalHeader>
 
           <ModalCloseButton />
@@ -196,7 +199,7 @@ const UpdateGroupChatModel = () => {
                   key={u._id}
                   user={u}
                   admin={chat.selectedChat.groupAdmin}
-                  handleFunction={() => handleRemove(u)}
+                  handleFunction={(e) => handleRemove(e, u)}
                 />
               ))}
             </Box>

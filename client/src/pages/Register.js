@@ -17,17 +17,6 @@ import MockupImage from "../assets/img/background.png";
 import "./register.css";
 
 const Register = () => {
-  const navigate = useNavigate();
-  const { auth } = useSelector((state) => state);
-
-  useEffect(() => {
-    if (auth.isLoggedIn) {
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-  }, [navigate, auth.isLoggedIn]);
-
   return (
     <>
       <div className="main-container">

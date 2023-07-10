@@ -3,11 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { isEmpty } from "lodash";
 import { socket } from "../socket";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+
 import {
   Box,
   FormControl,
-  IconButton,
   Input,
   Spinner,
   Text,
@@ -148,14 +147,9 @@ export default function SingleChat() {
             justifyContent={{ base: "space-between" }}
             alignItems="center"
           >
-            <IconButton
-              display={{ base: "flex", md: "none" }}
-              icon={<ArrowBackIcon />}
-              onClick={() => setSelectedChat("")}
-            />
             {!chat.selectedChat.isGroupChat && chat.selectedChat !== {} ? (
               <>
-                <div style={{ display: "flex" }}>
+                <span style={{ display: "flex" }}>
                   <Avatar
                     mt="7px"
                     mr={1}
@@ -182,7 +176,7 @@ export default function SingleChat() {
                       ).username
                     }
                   </span>
-                </div>
+                </span>
                 <ProfileModal
                   user={getUserThatsNotLoggedIn(
                     auth.user,
